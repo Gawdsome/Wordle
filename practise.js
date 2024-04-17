@@ -95,7 +95,6 @@ function checkWord() {
       } else {
       }
     }
-    word = [];
     cursor = 1;
     if (noOfCorrect == 5) {
       document.querySelector(".para").textContent =
