@@ -24,10 +24,8 @@ var gWord = [];
 
 function getWord() {
   var y = Math.floor(Math.random() * (listOfWords.length - 0));
-  console.log(y, listOfWords[y]);
 
   gWord = listOfWords[y].split("");
-  console.log(gWord);
   console.log(gWord.join(""));
 }
 getWord();
@@ -47,79 +45,137 @@ const allLetters = "abcdefghijklmnopqrstuvwxyz";
 document.addEventListener("keydown", function (event) {
   if (state !== "nt") {
     if (allLetters.includes(event.key)) {
-      if (word.length < 5 || word.length == 0) {
+      if (word.length < 5) {
         letter = event.key.toUpperCase();
-        document.querySelector(
-          "#l" + (cursor + 5 * (attempt - 1))
-        ).textContent = letter;
+        document.querySelector(`#w${attempt}l${cursor}`).textContent = letter;
         cursor++;
         word.push(letter);
-        console.log(word);
       }
     } else if (event.key == "Backspace") {
       if (word.length !== 0) {
         cursor--;
-        document.querySelector(
-          "#l" + (cursor + 5 * (attempt - 1))
-        ).textContent = "";
+        document.querySelector(`#w${attempt}l${cursor}`).textContent = "";
         word.pop();
-        console.log(word);
       }
     } else if (event.key == "Enter") {
-      checkWord();
+      if (word.length == 5) {
+        checkWord();
+      } else {
+        alert("pls fill in all slots");
+      }
     }
-  } else {
-    console.log("game over");
   }
 });
 
+const nOfLetters = [];
+var change = 0;
+var cLetter = "";
+
 function checkWord() {
-  noOfCorrect = 0;
-  if (word.length !== 5) {
-    document.querySelector(".para").style = "font-family:arial";
-    document.querySelector(".para").textContent =
-      "Please fill in all the slots before entering";
-    document.querySelector(".para").style =
-      'font-family: "Bungee Spice", sans-serif;';
-  } else {
-    document.querySelector(".para").textContent = "";
-    attempt++;
-    for (let i = 0; i <= 4; i++) {
-      if (word[i] == gWord[i]) {
-        document.querySelector("#l" + (i + 1 + 5 * (attempt - 2))).style =
-          "background:green";
-        noOfCorrect++;
-      } else if (gWord.includes(word[i])) {
-        document.querySelector("#l" + (i + 1 + 5 * (attempt - 2))).style =
-          "background:#CB9D06;";
-      } else {
+  for (let y = 0; y < 26; y++) {
+    change = 0;
+    cLetter = allLetters[y].toUpperCase();
+    for (let a = 0; a < 5; a++) {
+      if (cLetter.toUpperCase() == gWord[a]) {
+        change++;
       }
     }
-    word = [];
-    cursor = 1;
-    if (noOfCorrect == 5) {
-      document.querySelector(".para").textContent =
-        "You have gotten it right!!";
-      document.querySelector("#score").textContent = "Score: " + score;
-      state = "nt";
-    } else {
-      noOfCorrect = 0;
-      score = 7 - attempt;
-      console.log(score);
-      document.querySelector("#score").textContent = "Score: " + score;
+    if (gWord.includes(cLetter)) {
+      nOfLetters.push(allLetters[y].toUpperCase(), change);
     }
-    if (attempt == 7) {
-      state = "nt";
-      if (noOfCorrect !== 5) {
-        document.querySelector(
-          ".para"
-        ).textContent = `Hmmm..., you failed, the word was ${gWord.join(
-          ""
-        )}, better luck next time`;
+  }
+  console.log(nOfLetters);
+
+  // establishes change
+
+  const other = [];
+  for (let x = 0; x < 5; x++) {
+    if (nOfLetters.includes(word[x])) {
+      if (word[x] == gWord[x]) {
+        console.log("#w" + attempt + "l" + (x + 1));
+        document.querySelector("#w" + attempt + "l" + (x + 1)).style =
+          "background:green";
+        nOfLetters[nOfLetters.indexOf(word[x]) + 1] -= 1;
+        console.log(nOfLetters);
+        other.push(x);
+      } else {
+        document.querySelector("#w" + attempt + "l" + (x + 1)).style =
+          "background:gray";
       }
     }
   }
+  console.log(other);
+  for (let z = 0; z < 5; z++) {
+    if (other.includes(z)) {
+      console.log(other, "  gonna ignore this");
+    } else if (
+      gWord.includes(word[z]) &&
+      nOfLetters[nOfLetters.indexOf(word[z]) + 1] > 0
+    ) {
+      document.querySelector("#w" + attempt + "l" + (z + 1)).style =
+        "background:#C18F32";
+      nOfLetters[nOfLetters.indexOf(word[z]) + 1] -= 1;
+    } else {
+      document.querySelector("#w" + attempt + "l" + (z + 1)).style =
+        "background:gray";
+    }
+  }
+
+  attempt++;
+  state = "";
+  if (attempt == 7) {
+    state = "nt";
+  }
+  word = [];
+  cursor = 1;
+  console.log(attempt, state, word.length, cursor);
 }
+// noOfCorrect = 0;
+// if (word.length !== 5) {
+//   document.querySelector(".para").style = "font-family:arial";
+//   document.querySelector(".para").textContent =
+//     "Please fill in all the slots before entering";
+//   document.querySelector(".para").style =
+//     'font-family: "Bungee Spice", sans-serif;';
+// } else {
+//   document.querySelector(".para").textContent = "";
+//   attempt++;
+//   for (let i = 0; i <= 4; i++) {
+//     if (word[i] == gWord[i]) {
+//       document.querySelector("#l" + (i + 1 + 5 * (attempt - 2))).style =
+//         "background:green";
+//       noOfCorrect++;
+//     } else if (gWord.includes(word[i])) {
+//       document.querySelector("#l" + (i + 1 + 5 * (attempt - 2))).style =
+//         "background:#CB9D06;";
+//     } else {
+//     }
+//   }
+//   word = [];
+//   cursor = 1;
+//   if (noOfCorrect == 5) {
+//     document.querySelector(".para").textContent =
+//       "You have gotten it right!!";
+//     document.querySelector("#score").textContent = "Score: " + score;
+//     state = "nt";
+//   } else {
+//     noOfCorrect = 0;
+//     score = 7 - attempt;
+//     console.log(score);
+//     document.querySelector("#score").textContent = "Score: " + score;
+//   }
+//   if (attempt == 7) {
+//     state = "nt";
+//     if (noOfCorrect !== 5) {
+//       document.querySelector(
+//         ".para"
+//       ).textContent = `Hmmm..., you failed, the word was ${gWord.join(
+//         ""
+//       )}, better luck next time`;
+//     }
+//   }
+// }
+
 var elements = "";
 function newAttempt() {
   getWord();
