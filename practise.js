@@ -59,9 +59,10 @@ document.addEventListener("keydown", function (event) {
       }
     } else if (event.key == "Enter") {
       if (word.length == 5) {
-        checkWord();
+        initiate();
       } else {
-        alert("pls fill in all slots");
+        document.querySelector("#para").textContent =
+          "Please fill in all the slots";
       }
     }
   }
@@ -70,65 +71,92 @@ document.addEventListener("keydown", function (event) {
 const nOfLetters = [];
 var change = 0;
 var cLetter = "";
+var wordDef;
+
+function initiate() {
+  checkWord();
+  const wait = setTimeout(greenYellow, 1000);
+}
 
 function checkWord() {
-  for (let y = 0; y < 26; y++) {
-    change = 0;
-    cLetter = allLetters[y].toUpperCase();
-    for (let a = 0; a < 5; a++) {
-      if (cLetter.toUpperCase() == gWord[a]) {
-        change++;
+  fetch(
+    `https://api.dictionaryapi.dev/api/v2/entries/en/${word.join("")}`
+  ).then(
+    (response) => {
+      console.log(response.json());
+      wordDef = response;
+      console.log(wordDef);
+    },
+    (response) => {
+      console.error("err", response);
+    }
+  );
+}
+
+function greenYellow() {
+  console.log(wordDef.ok);
+
+  if (wordDef.ok) {
+    for (let y = 0; y < 26; y++) {
+      change = 0;
+      cLetter = allLetters[y].toUpperCase();
+      for (let a = 0; a < 5; a++) {
+        if (cLetter.toUpperCase() == gWord[a]) {
+          change++;
+        }
+      }
+      if (gWord.includes(cLetter)) {
+        nOfLetters.push(allLetters[y].toUpperCase(), change);
       }
     }
-    if (gWord.includes(cLetter)) {
-      nOfLetters.push(allLetters[y].toUpperCase(), change);
+    console.log(nOfLetters);
+
+    // establishes change
+
+    const other = [];
+    for (let x = 0; x < 5; x++) {
+      if (nOfLetters.includes(word[x])) {
+        if (word[x] == gWord[x]) {
+          console.log("#w" + attempt + "l" + (x + 1));
+          document.querySelector("#w" + attempt + "l" + (x + 1)).style =
+            "background:green";
+          nOfLetters[nOfLetters.indexOf(word[x]) + 1] -= 1;
+          console.log(nOfLetters);
+          other.push(x);
+        } else {
+          document.querySelector("#w" + attempt + "l" + (x + 1)).style =
+            "background:gray";
+        }
+      }
     }
-  }
-  console.log(nOfLetters);
-
-  // establishes change
-
-  const other = [];
-  for (let x = 0; x < 5; x++) {
-    if (nOfLetters.includes(word[x])) {
-      if (word[x] == gWord[x]) {
-        console.log("#w" + attempt + "l" + (x + 1));
-        document.querySelector("#w" + attempt + "l" + (x + 1)).style =
-          "background:green";
-        nOfLetters[nOfLetters.indexOf(word[x]) + 1] -= 1;
-        console.log(nOfLetters);
-        other.push(x);
+    console.log(other);
+    for (let z = 0; z < 5; z++) {
+      if (other.includes(z)) {
+        console.log(other, "  gonna ignore this");
+      } else if (
+        gWord.includes(word[z]) &&
+        nOfLetters[nOfLetters.indexOf(word[z]) + 1] > 0
+      ) {
+        document.querySelector("#w" + attempt + "l" + (z + 1)).style =
+          "background:#C18F32";
+        nOfLetters[nOfLetters.indexOf(word[z]) + 1] -= 1;
       } else {
-        document.querySelector("#w" + attempt + "l" + (x + 1)).style =
+        document.querySelector("#w" + attempt + "l" + (z + 1)).style =
           "background:gray";
       }
     }
-  }
-  console.log(other);
-  for (let z = 0; z < 5; z++) {
-    if (other.includes(z)) {
-      console.log(other, "  gonna ignore this");
-    } else if (
-      gWord.includes(word[z]) &&
-      nOfLetters[nOfLetters.indexOf(word[z]) + 1] > 0
-    ) {
-      document.querySelector("#w" + attempt + "l" + (z + 1)).style =
-        "background:#C18F32";
-      nOfLetters[nOfLetters.indexOf(word[z]) + 1] -= 1;
-    } else {
-      document.querySelector("#w" + attempt + "l" + (z + 1)).style =
-        "background:gray";
-    }
-  }
 
-  attempt++;
-  state = "";
-  if (attempt == 7) {
-    state = "nt";
+    attempt++;
+    state = "";
+    if (attempt == 7) {
+      state = "nt";
+    }
+    word = [];
+    cursor = 1;
+    console.log(attempt, state, word.length, cursor);
+  } else {
+    alert("please use a real word");
   }
-  word = [];
-  cursor = 1;
-  console.log(attempt, state, word.length, cursor);
 }
 // noOfCorrect = 0;
 // if (word.length !== 5) {
@@ -203,3 +231,11 @@ function newAttempt() {
   score = 6;
   document.querySelector("#score").textContent = "Score: " + score;
 }
+
+const karan = {
+  fname: "Karan",
+  lname: "Sharma",
+  age: 14,
+};
+console.log(karan);
+console.log(karan.fname);
